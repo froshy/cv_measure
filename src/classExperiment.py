@@ -14,7 +14,6 @@ class MeasureExperiment():
                                             # the detected objects midpoints will correspond to the midpoint that is closest in the existing one.
                                             # if we detect more objects than we initialized, then the objects farthest away from the midpoints will be ignored
         #self.last_frame = None
-        
     
     def initialize_from_frame(self, img:ImageInfo):
         assert len(img.get_axes()) == self.total_obj, f'Detected {len(img.get_axes())} objects but expected {self.total_obj}'
