@@ -1,0 +1,10 @@
+.idea
+.vscode
+dummy/
+full_img/
+img/
+output/
+vid/
+*.mkv
+*.jpg
+.env
