@@ -2,7 +2,6 @@ import cv2 as cv
 import imutils
 from imutils import perspective
 import numpy as np
-import os
 
 from configuration import *
 import func_utils
