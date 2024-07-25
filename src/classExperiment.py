@@ -13,16 +13,22 @@ class MeasureExperiment():
         self.mdpts = None                   # These midpoints correspond to each object, if we detect less objects in the next frame, 
                                             # the detected objects midpoints will correspond to the midpoint that is closest in the existing one.
                                             # if we detect more objects than we initialized, then the objects farthest away from the midpoints will be ignored
-        #self.last_frame = None
+        self.log_by_mdpt = None             # initialized as None, but will be a dictionary where key is the midpoint (tuple) and values are a log of lengths associated with the object of the midpoint
     
     def initialize_from_frame(self, img:ImageInfo):
         assert len(img.get_axes()) == self.total_obj, f'Detected {len(img.get_axes())} objects but expected {self.total_obj}'
         self.px2len_rate = self._initialize_px2len_rate(img)
-        self.mdpts = self._initialize_mdpts()
+        self.mdpts = self._initialize_mdpts(img)
+        self.log_by_mdpt = self._initialize_log_by_mdpt()
         #self.last_frame = img
         
-    def _initialize_mdpts(self):
-        pass
+    def _initialize_log_by_mdpt(self):
+        log = {tuple(mdpt): [] for mdpt in self.mdpts}
+        return log
+        
+        
+    def _initialize_mdpts(self, img: ImageInfo):
+        return img.get_midpoints()
     def _initialize_px2len_rate(self, img:ImageInfo):
         box = img.get_boxes()[self.ref_index]
         ax = img.get_axes()[self.ref_index]
