@@ -12,6 +12,7 @@ def measure_stent(img:ImageInfo, contoured_img):
     midpoints = img.get_midpoints()
     lines = []
     min_dists = []
+    mdpts = []
     for box, ax, mdpt in zip(scan_boxes, axes, midpoints):
         min_dist = np.inf
         _, box_height, neg_side, pos_side = func_utils.width_height(box, ax, mdpt)
@@ -33,7 +34,8 @@ def measure_stent(img:ImageInfo, contoured_img):
                 line = [wt_px_n, wt_px_p]
         lines.append(line)
         min_dists.append(min_dist)
-    return np.array(lines), np.array(min_dists)
+        mdpts.append(mdpt)
+    return np.array(lines), np.array(min_dists), np.array(mdpts)
 
 ###
 
