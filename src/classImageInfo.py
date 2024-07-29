@@ -56,10 +56,9 @@ class ImageInfo:
         """
         morph_img = cv.cvtColor(self.get_image(), cv.COLOR_BGR2GRAY)
         v =  np.median(morph_img)
-        lower = int(max(0, 2*(1-CANNY_SIGMA) * v))
-        upper = int(min(255, 2*(1-CANNY_SIGMA) * v))
-        #lower, upper = 0,255
-        #morph_img = cv.GaussianBlur(self.get_image(), (3,3), 0)
+        lower = int(max(0, (1-CANNY_SIGMA) * v))
+        upper = int(min(255, (1+CANNY_SIGMA) * v))
+        #morph_img = cv.GaussianBlur(self.get_image(), (5,5), 1)
         morph_img = cv.Canny(morph_img, lower, upper)
         morph_img = cv.dilate(morph_img, None, iterations=MORPHOLOGICAL_ITERS)
         morph_img = cv.erode(morph_img, None, iterations=MORPHOLOGICAL_ITERS)
