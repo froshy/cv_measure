@@ -184,7 +184,9 @@ class MeasureExperiment():
             if i == REFERENCE_INDEX:
                 continue
             log_df[STENT_NAMES[i]] = self.log_by_mdpt[sorted_keys[i]] * np.array(self.px2len_rate)
-        log_df.to_csv(OUT_DIR / filename)
+        if save_file:
+            log_df.to_csv(OUT_DIR / filename)
+        return log_df
         
         
     def get_mdpts(self):
@@ -195,3 +197,8 @@ class MeasureExperiment():
             ???: the midpoints initialized from initialize_from_frame
         """
         return self.mdpts
+    
+    def read_thermometer(self, img):
+        pass
+        return
+        
