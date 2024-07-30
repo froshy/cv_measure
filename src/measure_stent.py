@@ -42,12 +42,12 @@ def measure_stent(img:ImageInfo, contoured_img):
 # Use one or other in single channel images. The images these are being called on should be binary (every pixel is either black (0) or white (255))
     
 def is_black(img, y, x):
-    if img[x,y] < BLACK_PIXEL_THRESHOLD:
+    if img[x,y] <= BLACK_PIXEL_THRESHOLD:
         return True
     return False
 
 def is_white(img, x, y):
-    if img[x,y] > WHITE_PIXEL_THRESHOLD:
+    if img[x,y] >= WHITE_PIXEL_THRESHOLD:
         return True
     return False
 
