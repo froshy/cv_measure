@@ -261,6 +261,8 @@ class ImageInfo:
         """
         if image is None:
             image = self.get_image()
+        else:
+            image = image.copy()
         for st, end in lines:
             cv.line(image, np.round(st).astype(int), np.round(end).astype(int), line_color, 1)
         return image
@@ -290,7 +292,7 @@ class ImageInfo:
         Returns:
             (np.array): a matrix representation of image
         """
-        return self.image
+        return self.image.copy()
     
     def pix_to_len(self, n_pixels):
         """
