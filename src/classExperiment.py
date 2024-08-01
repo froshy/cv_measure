@@ -31,6 +31,7 @@ class MeasureExperiment():
                                             # if we detect more objects than we initialized, then the objects farthest away from the midpoints will be ignored
         self.log_by_mdpt = None             # initialized as None, but will be a dictionary where key is the midpoint (tuple) and values are a log of lengths associated with the object of the midpoint
         self.time_log = None
+        self.temp_log = None
         self.start_time = None
     def initialize_from_frame(self, img:ImageInfo, include_time = True):
         """
@@ -50,7 +51,7 @@ class MeasureExperiment():
             return False
         self.px2len_rate = self._initialize_px2len_rate(img)
         self.mdpts = self._initialize_mdpts(img)
-        self.log_by_mdpt, self.time_log = self._initialize_logs(include_time)
+        self.log_by_mdpt, self.time_log, self.temp_log = self._initialize_logs(include_time)
         self.start_time = time.time()
         return True
         
@@ -68,7 +69,8 @@ class MeasureExperiment():
         time_log = None
         if include_time:
             time_log = []
-        return log, time_log
+        temp_log = []
+        return log, time_log, temp_log
         
     def _initialize_mdpts(self, img: ImageInfo):
         """
@@ -153,6 +155,9 @@ class MeasureExperiment():
             self.log_by_mdpt[tuple(closest_mdpt)].append(dist)
         if self.time_log is not None:
             self.time_log.append(time.time() - self.start_time)
+        # temp = self.read_thermometer()
+        # if temp is not None:
+        #     self.temp_log.append(temp)
         
     def _closest_point_to_mdpts(self, pt, mdpts):
         """
@@ -198,7 +203,14 @@ class MeasureExperiment():
         """
         return self.mdpts
     
-    def read_thermometer(self, img):
+    def read_thermometer(self):
+        """
+        Assuming that a thermometer is being read to a pc, this method returns the value being passed to 
+        the pc. For logging purposes.
+
+        Args:
+            img (_type_): _description_
+        """
         pass
-        return
+        
         
