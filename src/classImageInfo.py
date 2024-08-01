@@ -189,7 +189,7 @@ class ImageInfo:
         contoured_image = self.get_contoured_image(image=image, contour_color=contour_color, fill_contour=fill_contour)
         cv.imshow(f'contoured', contoured_image)
     
-    def get_scan_box_image(self, image=None, box_color=(255,255,255), box_id=-1):
+    def get_scan_box_image(self, image=None, box_color=(255,255,255), box_id=-1, box_thickness =1):
         """
         Returns image with scan boxes drawn on
 
@@ -205,7 +205,7 @@ class ImageInfo:
             image = self.image.copy()
         else:
             image = image.copy()
-        cv.drawContours(image, np.array(self.scan_boxes), box_id, box_color, 1)
+        cv.drawContours(image, np.array(self.scan_boxes), box_id, box_color, box_thickness)
         return image
     
     def get_boxed_image(self, image=None, box_color=(255, 255, 255), box_id=-1, box_thickness=1):
