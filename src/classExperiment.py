@@ -212,5 +212,42 @@ class MeasureExperiment():
             img (_type_): _description_
         """
         pass
+    
+    def run_experiment(self):
+        cap = cv.VideoCapture(0)
+        cv.namedWindow('vid1', cv.WINDOW_NORMAL)
+        cv.namedWindow('vid2', cv.WINDOW_NORMAL)
+        while cap.isOpened():
+            
+            rval, frame = cap.read()
+            cv.imshow('vid1', frame)
+            img = ImageInfo(frame)
+            
+            cont_morph_box = img.get_boxed_image(img.get_contoured_image(img.get_morph_image()), box_color=(0,0,255), box_thickness=3)
+            cv.imshow('vid2', cont_morph_box)
+            if cv.waitKey(1) == ord(' '):
+                img = ImageInfo(frame) 
+                self.initialize_from_frame(img, INCLUDE_TIME_LOG)
+                break
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                print("broken or vid_end")
+                break
+            cv.imshow('vid1', frame)
+            if cv.waitKey(1) == ord('q'):
+                break
+            
+            img = ImageInfo(frame)
+            cont_mor = img.get_contoured_image(img.get_morph_image())
+            cont_mor = cv.cvtColor(cont_mor, cv.COLOR_GRAY2BGR)
+            cont_mor = self.display_measure(img, cont_mor, display_line=True)
+            #boxed = img.get_boxed_image(cont_mor, box_color=(0,0,255))
+            cv.imshow('vid2', cont_mor)
+            self.log_values(img)
+        
+        self.log_to_dataframe()
+        
+        cap.release()
         
         
