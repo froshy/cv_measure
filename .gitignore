@@ -8,3 +8,5 @@ vid/
 *.mkv
 *.jpg
 .env
+.ipynb
+therm_img/

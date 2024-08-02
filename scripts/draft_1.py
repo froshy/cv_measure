@@ -1,5 +1,4 @@
 from classImageInfo import *
-import measure_stent as ms
 import cv2 as cv
 import time
 import os

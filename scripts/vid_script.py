@@ -2,7 +2,7 @@ import cv2 as cv
 import time
 from classImageInfo import *
 import func_utils
-import measure_stent
+# import measure_stent
 from classExperiment import *
 def foo():
     filename = "./vid/big_stent_vid.mkv"
