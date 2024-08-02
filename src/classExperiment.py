@@ -94,6 +94,7 @@ class MeasureExperiment():
         Returns:
             float: the conversion value to multiply by to go from pixels -> length
         """
+        return img.get_px2len_rate()
         box = img.get_boxes()[self.ref_index]
         ax = img.get_axes()[self.ref_index]
         mdpt = img.get_midpoints()[self.ref_index]
@@ -111,11 +112,11 @@ class MeasureExperiment():
         Returns:
             (list of lines, list of float, list of mdpts): tuple of list of lines, list of distances, and list of midpoints
         """
+        
         if len(img.get_axes()) != self.n_total_obj:
             warnings.warn(f'Detected {len(img.get_axes())} objects but expected {self.n_total_obj}')
         # else:
-        #     self.mdpts = self._initialize_mdpts(img)
-        lines, min_dists_px, mdpts = measure_stent.measure_stent(img, img.get_contoured_image(img.get_morph_image()))
+        lines, min_dists_px, mdpts = img.measure_objects()
         return lines, min_dists_px, mdpts
     
     def display_measure(self, img:ImageInfo, proc_img, in_unit=True, display_line = False):

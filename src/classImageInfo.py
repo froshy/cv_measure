@@ -31,7 +31,7 @@ class ImageInfo:
         midpts, axs = self._initialize_midpoint_axis()
         self.midpoints = midpts
         self.axes = axs
-        
+        self.px2len_rate = self._initialize_px2len_rate()
         self.scan_boxes = self._initialize_scan_boxes()
         
     def _initialize_contours(self):
@@ -157,7 +157,56 @@ class ImageInfo:
                 new_y = ((new_y - (w-1)) / axis[1]) * axis[0] + new_y
             res_corner.append([new_x,new_y])
         return np.array(res_corner).astype(int)
-
+    def _initialize_px2len_rate(self):
+        box = self.get_boxes()[REFERENCE_INDEX]
+        ax = self.get_axes()[REFERENCE_INDEX]
+        mdpt = self.get_midpoints()[REFERENCE_INDEX]
+        
+        _, height, _, _ = func_utils.width_height(box, ax, mdpt)
+        return REFERENCE_OBJECT_LENGTH / height
+    
+    def measure_objects(self):
+        scan_boxes = self.get_scan_boxes()
+        axes = self.get_axes()
+        midpoints = self.get_midpoints()
+        lines = []
+        min_dists = []
+        mdpts = []
+        contoured_img = self.get_contoured_image(self.get_morph_image())
+        for box, ax, mdpt in zip(scan_boxes, axes, midpoints):
+            min_dist = np.inf
+            _, box_height, neg_side, pos_side = func_utils.width_height(box, ax, mdpt)
+            n1, n2 = neg_side                                                   # by the way we constructed the boxes, there should always be 2 values in neg side and 2 in pos side
+            p1, p2 = pos_side
+            vec_n = func_utils.get_unit_vec(n1, n2)
+            vec_p = func_utils.get_unit_vec(p1, p2)
+            start_neg = func_utils.get_starting_pts(n1, vec_n, box_height, SCAN_FREQ)
+            start_pos = func_utils.get_starting_pts(p1, vec_p, box_height, SCAN_FREQ)
+            scan_direction = np.array([-1,1]) * np.flip(ax, axis=0)
+            scan_direction = scan_direction / np.linalg.norm(scan_direction)
+            
+            for (pt_neg), (pt_pos) in zip(start_neg, start_pos):
+                wt_px_n = func_utils.white_pixel_coords(contoured_img, pt_neg, scan_direction, mdpt)
+                wt_px_p = func_utils.white_pixel_coords(contoured_img, pt_pos, scan_direction, mdpt)
+                dist = np.linalg.norm(wt_px_n - wt_px_p)
+                if dist < min_dist:
+                    min_dist = dist
+                    line = [wt_px_n, wt_px_p]
+            lines.append(line)
+            min_dists.append(min_dist)
+            mdpts.append(mdpt)
+        return np.array(lines), np.array(min_dists), np.array(mdpts)
+    
+    def get_measured_image(self, image=None, in_unit=True, display_line=True):
+        lines, min_dists, _ = self.measure_objects()
+        if image is None:
+            image = self.get_image()
+        if in_unit:
+            min_dists = min_dists * self.px2len_rate
+        if display_line:
+            proc_img = self.get_line_draw_img(lines, image)
+        proc_img = self.get_display_vals_img(image, min_dists)
+        return proc_img
     def show_morph_image(self):
         """
         Displays image from morphological transforms
@@ -267,7 +316,7 @@ class ImageInfo:
             cv.line(image, np.round(st).astype(int), np.round(end).astype(int), line_color, 1)
         return image
     
-    def get_display_vals_img(self, image, vals):
+    def get_display_vals_img(self, image, vals, round=5):
         """
         Returns image with values drawn on
 
@@ -280,9 +329,14 @@ class ImageInfo:
             matrix: image
         """
         assert len(vals) == len(self.get_axes())
-        vals = np.round(vals, 5)
+        vals = np.round(vals, round)
+        font_scale = self.get_image().shape[0] * self.get_image().shape[1] / (1920 * 1080)
+        img_height = self.get_image().shape[0]
+        img_width = self.get_image().shape[1]
+        fontScale = min(img_width,img_height)/(700)
+        thickness = np.max([int(3 * fontScale), 1])
         for val, mdpt in zip(vals, self.get_midpoints()):
-            cv.putText(image, str(val), np.round(mdpt + [10,10]).astype(int), cv.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 3)
+            cv.putText(image, str(val), np.round(mdpt).astype(int), cv.FONT_HERSHEY_SIMPLEX, fontScale, (0,0,255), thickness)
         return image
     
     def get_image(self):
@@ -341,3 +395,6 @@ class ImageInfo:
             (list of [x,y]): list of directions of objects (along longest dimension) in order of from left -> right
         """
         return self.axes
+    
+    def get_px2len_rate(self):
+        return self.px2len_rate
